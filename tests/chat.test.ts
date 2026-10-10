@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { completionBody, complete, getModels, errorMessage } from '../src/lib/apis/forge';
+import { completionBody, complete, getModels, errorMessage, ForgeError } from '../src/lib/apis/forge';
 import { HISTORY_KEY, loadHistory, saveHistory, loadSettings } from '../src/lib/persistence';
 import type { Conversation } from '../src/lib/types';
 
@@ -21,6 +21,8 @@ describe('Forge request contract', () => {
 	it('renders context and unsupported-parameter errors clearly', () => {
 		expect(errorMessage({ type: 'context_length_exceeded', message: 'formatted input exceeds context (1024)' })).toContain('History has been kept');
 		expect(errorMessage({ message: 'temperature must be 0' })).toBe('temperature must be 0');
+		const formatted = errorMessage({ type: 'context_length_exceeded', message: 'formatted input exceeds context (1024)' });
+		expect(errorMessage(new ForgeError(formatted))).toBe(formatted);
 	});
 	it('passes AbortSignal to fetch and preserves cancellation', async () => {
 		const abort = new AbortController();

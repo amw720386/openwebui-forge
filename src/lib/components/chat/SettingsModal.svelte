@@ -7,7 +7,12 @@
 	export let exportChats: () => void;
 	let maxTokens = 64;
 	let theme: Settings['theme'] = 'system';
-	$: if (show) { maxTokens = $settings.maxTokens; theme = $settings.theme; }
+	let initialized = false;
+	$: if (show && !initialized) {
+		initialized = true;
+		maxTokens = $settings.maxTokens;
+		theme = $settings.theme;
+	} else if (!show) initialized = false;
 	function save() {
 		if (!Number.isInteger(maxTokens) || maxTokens < 1 || maxTokens > 2048) return;
 		settings.set({ maxTokens, theme }); show = false;

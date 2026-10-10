@@ -1,0 +1,13 @@
+openwebui-forge is derived from Open WebUI v0.6.5
+https://github.com/open-webui/open-webui/tree/v0.6.5
+Base commit: 07d8460126a686de9a99e2662d06106e22c3f6b6
+
+Copyright (c) 2023-2025 Timothy Jaeryang Baek
+All rights reserved.
+
+The original frontend was created by the Open WebUI authors and contributors.
+Their BSD-3-Clause license is reproduced in LICENSE. Neither the upstream
+authors nor contributors endorse this derivative.
+
+Only the v0.6.5 source is used; later Open WebUI licensing terms were not adopted.
+Third-party dependency licenses remain applicable to their respective packages.

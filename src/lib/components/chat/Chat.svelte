@@ -28,6 +28,7 @@
 	let deleteId = '';
 	let confirmDelete = false;
 	let busy = false;
+	let generatingId = '';
 	let controller: AbortController | undefined;
 	let discoveryController: AbortController | undefined;
 	let viewport: HTMLDivElement;
@@ -52,6 +53,11 @@
 
 	function publish(chat: Conversation) {
 		chats.update((items) => [chat, ...items.filter((item) => item.id !== chat.id)]);
+	}
+	function publishResponse(chat: Conversation) {
+		// Keep a title edited in the sidebar while the response is streaming.
+		chats.update((items) => items.map((current) => current.id === chat.id
+			? { ...current, messages: [...chat.messages], updatedAt: chat.updatedAt } : current));
 	}
 	async function scrollToBottom() {
 		await tick();
@@ -107,6 +113,7 @@
 		const abort = new AbortController();
 		controller = abort;
 		busy = true;
+		generatingId = chat.id;
 		autoScroll = true;
 		const response: Message = { id: crypto.randomUUID(), role: 'assistant', content: '', status: 'streaming' };
 		const running = { ...chat, messages: [...chat.messages, response], updatedAt: Date.now() };
@@ -116,7 +123,7 @@
 			for await (const update of complete(chat, $settings.maxTokens, abort.signal)) {
 				response.content += update.value;
 				if (update.finishReason) response.finishReason = update.finishReason;
-				publish({ ...running, messages: [...running.messages] });
+				publishResponse(running);
 				scrollToBottom();
 			}
 			response.status = abort.signal.aborted ? 'stopped' : 'complete';
@@ -124,8 +131,8 @@
 			response.status = abort.signal.aborted ? 'stopped' : 'error';
 			if (!abort.signal.aborted) response.error = errorMessage(error);
 		} finally {
-			publish({ ...running, updatedAt: Date.now(), messages: [...running.messages] });
-			if (controller === abort) { controller = undefined; busy = false; }
+			publishResponse({ ...running, updatedAt: Date.now() });
+			if (controller === abort) { controller = undefined; busy = false; generatingId = ''; }
 			scrollToBottom();
 		}
 	}
@@ -134,12 +141,12 @@
 	}
 	function requestDelete(id: string) { deleteId = id; confirmDelete = true; }
 	async function deleteChat() {
-		if (deleteId === activeId) {
+		if (deleteId === generatingId) {
 			stopResponse();
 			// Wait for the running request's final state before removing its history.
 			while (busy) await new Promise((resolve) => setTimeout(resolve, 10));
-			await goto('/');
 		}
+		if (deleteId === activeId) await goto('/');
 		chats.update((items) => items.filter((chat) => chat.id !== deleteId));
 		confirmDelete = false;
 	}
