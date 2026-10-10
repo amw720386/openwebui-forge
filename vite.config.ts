@@ -18,6 +18,8 @@ import { viteStaticCopy } from 'vite-plugin-static-copy';
 // };
 
 export default defineConfig({
+	server: { watch: { ignored: ['**/.venv/**', '**/.baseline/**'] } },
+	optimizeDeps: { entries: ['src/routes/**/*.svelte'] },
 	plugins: [
 		sveltekit(),
 		viteStaticCopy({
