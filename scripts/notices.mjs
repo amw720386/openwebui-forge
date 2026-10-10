@@ -25,5 +25,5 @@ while (queue.length) {
   for (const file of files) text += `${file}\n${await readFile(join(path, file), 'utf8')}\n`;
   text += '\n----------------------------------------\n\n';
 }
-await writeFile('static/THIRD_PARTY_NOTICES.txt', text);
+await writeFile('static/THIRD_PARTY_NOTICES.txt', text.trimEnd() + '\n');
 console.log(`Preserved notices for ${seen.size} runtime packages`);
