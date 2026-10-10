@@ -1,0 +1,1 @@
+<!-- Conversations share the root chat layout. -->

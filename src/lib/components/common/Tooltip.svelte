@@ -2,22 +2,20 @@
 	import DOMPurify from 'dompurify';
 
 	import { onDestroy } from 'svelte';
-	import { marked } from 'marked';
 
-	import tippy from 'tippy.js';
-	import { roundArrow } from 'tippy.js';
+	import tippy, { type Instance, type Placement } from 'tippy.js';
 
-	export let placement = 'top';
+	export let placement: Placement = 'top';
 	export let content = `I'm a tooltip!`;
 	export let touch = true;
 	export let className = 'flex';
 	export let theme = '';
-	export let offset = [0, 4];
+	export let offset: [number, number] = [0, 4];
 	export let allowHTML = true;
 	export let tippyOptions = {};
 
-	let tooltipElement;
-	let tooltipInstance;
+	let tooltipElement: HTMLDivElement;
+	let tooltipInstance: Instance | undefined;
 
 	$: if (tooltipElement && content) {
 		if (tooltipInstance) {
@@ -37,6 +35,7 @@
 	} else if (tooltipInstance && content === '') {
 		if (tooltipInstance) {
 			tooltipInstance.destroy();
+			tooltipInstance = undefined;
 		}
 	}
 

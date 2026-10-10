@@ -1,0 +1,1 @@
+<!-- Chat is mounted in the persistent root layout. -->
